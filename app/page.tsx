@@ -38,7 +38,7 @@ export default function SetupPage() {
   } | null>(null);
 
   useEffect(() => {
-    // 挂载后读取上次训练记录(浏览器存储)
+    // Read last session record from browser storage after mount
     const rec = loadSessionRecord();
     if (rec?.histories.length || rec?.inProgress) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -52,7 +52,7 @@ export default function SetupPage() {
 
   const oppCount = tableSize - 1;
 
-  // 对手风格全随机, 开局后(若选择显示)在座位上揭晓
+  // Opponent personalities are random, revealed at seats after start (if show is enabled)
   const opponents: OpponentConfig[] = useMemo(
     () =>
       Array.from({ length: oppCount }, (_, i) => ({
@@ -79,7 +79,7 @@ export default function SetupPage() {
 
   return (
     <main className="relative min-h-[100dvh] overflow-hidden">
-      {/* HyperFrames 渲染的氛围视频背景: fixed 锁定视口, 不随内容高度变化 */}
+      {/* Atmosphere video background rendered by HyperFrames: fixed viewport, doesn't scroll with content */}
       <div className="fixed inset-0" aria-hidden="true">
         {!reduce && (
           <video
@@ -103,7 +103,7 @@ export default function SetupPage() {
       </div>
 
       <div className="relative z-10 max-w-[1240px] mx-auto px-4 sm:px-8 py-10 lg:py-0 lg:min-h-[100dvh] grid grid-cols-1 lg:grid-cols-[1fr_450px] gap-10 lg:gap-20 items-start lg:items-center">
-        {/* 左: 品牌与说明 */}
+        {/* Left: Brand & description */}
         <motion.section
           initial={reduce ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -114,13 +114,14 @@ export default function SetupPage() {
             <span className="text-accent text-sm font-mono tracking-[0.45em]">FELT LAB</span>
           </div>
           <h1 className="mt-5 text-5xl md:text-7xl font-semibold tracking-tighter leading-[0.95]">
-            翻牌屋
+            Flop House
           </h1>
           <p className="mt-6 text-lg text-muted leading-relaxed max-w-[40ch]">
-            和会算范围的对手过招。每一手都被实时拆解, 打完整局还有行为模式复盘。
+            Compete against opponents who think in ranges. Every hand is broken down in real time,
+            with a full behavioral review after the session.
           </p>
 
-          {/* 六种对手风格预览 */}
+          {/* Six opponent style preview */}
           <div className="mt-7 flex flex-wrap gap-1.5 max-w-[44ch]">
             {PERSONALITY_IDS.map((id) => (
               <span
@@ -137,25 +138,25 @@ export default function SetupPage() {
             ))}
           </div>
 
-          {/* 上次训练入口: 未打完的优先提供"继续" */}
+          {/* Last session entry: prioritize "Continue" for unfinished games */}
           {lastSession?.inProgress ? (
             <Link
               href="/table"
               className="mt-5 inline-flex items-center gap-2 text-xs px-3.5 py-2 rounded-full glass text-accent border border-accent/30 hover:border-accent transition-colors"
             >
-              有一局未打完: 已打 {lastSession.hands} 手,{' '}
+              One unfinished game: {lastSession.hands} hands played,{' '}
               <span className="font-mono">
                 {lastSession.netBB >= 0 ? '+' : ''}
                 {lastSession.netBB.toFixed(1)}BB
               </span>
-              · 继续训练 <ArrowRight size={12} />
+              · Continue training <ArrowRight size={12} />
             </Link>
           ) : lastSession ? (
             <Link
               href="/review"
               className="mt-5 inline-flex items-center gap-2 text-xs px-3.5 py-2 rounded-full glass text-muted hover:text-accent transition-colors"
             >
-              上次训练: {lastSession.hands} 手,{' '}
+              Last session: {lastSession.hands} hands,{' '}
               <span
                 className="font-mono"
                 style={{
@@ -165,7 +166,7 @@ export default function SetupPage() {
                 {lastSession.netBB >= 0 ? '+' : ''}
                 {lastSession.netBB.toFixed(1)}BB
               </span>
-              · 查看复盘 <ArrowRight size={12} />
+              · View review <ArrowRight size={12} />
             </Link>
           ) : null}
 
@@ -175,7 +176,8 @@ export default function SetupPage() {
                 <Strategy size={17} className="text-accent" />
               </span>
               <span className="text-muted leading-relaxed">
-                标准范围表 + 范围对范围引擎驱动的 GTO 近似对手, 可叠加紧弱、松凶、跟注站等性格供你剥削。
+                Standard range charts + range‑vs‑range GTO‑approximated opponents, with exploitable
+                traits like tight‑passive, loose‑aggressive, calling station, etc.
               </span>
             </li>
             <li className="flex gap-3.5">
@@ -183,7 +185,8 @@ export default function SetupPage() {
                 <UsersThree size={17} className="text-accent" />
               </span>
               <span className="text-muted leading-relaxed">
-                单挑到 9 人满员桌, 位置、盲注、边池全按规则; 单挑与多人桌使用不同的均衡范围。
+                Heads‑up up to 9‑handed full ring, with position, blinds, and side pots all
+                correctly implemented. Different balanced ranges for heads‑up vs multi‑way pots.
               </span>
             </li>
             <li className="flex gap-3.5">
@@ -191,14 +194,15 @@ export default function SetupPage() {
                 <Sparkle size={17} className="text-accent" />
               </span>
               <span className="text-muted leading-relaxed">
-                每手实时拆解决策点(对手范围 / 胜率 / 教练建议), 弃牌后兔子洞看反事实,
-                整局结束生成行为模式复盘, 任意一手可渲染回放视频。
+                Real‑time breakdown of each decision point (opponent ranges / equity / coach
+                advice), rabbit hole after folding to see counterfactuals, and a full behavioral
+                review at the end of the session. Every hand can be rendered as a replay video.
               </span>
             </li>
           </ul>
         </motion.section>
 
-        {/* 右: 设置面板 */}
+        {/* Right: Settings panel */}
         <motion.section
           initial={reduce ? false : { opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -207,7 +211,7 @@ export default function SetupPage() {
           style={{ backgroundColor: 'rgb(12 16 20 / 0.82)' }}
         >
           <div>
-            <div className="text-sm font-medium mb-2.5">桌型</div>
+            <div className="text-sm font-medium mb-2.5">Table size</div>
             <div className="flex gap-1.5 flex-wrap">
               {TABLE_SIZES.map((n) => (
                 <button
@@ -216,7 +220,7 @@ export default function SetupPage() {
                   onClick={() => setTableSize(n)}
                   className="seg px-4 py-2 text-sm"
                 >
-                  {n === 2 ? '单挑' : `${n} 人`}
+                  {n === 2 ? 'Heads‑up' : `${n} players`}
                 </button>
               ))}
             </div>
@@ -224,26 +228,26 @@ export default function SetupPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <div className="text-sm font-medium mb-2.5">风格可见性</div>
+              <div className="text-sm font-medium mb-2.5">Personality visibility</div>
               <div className="flex gap-1.5">
                 <button
                   data-on={showPersonalities}
                   onClick={() => setShowPersonalities(true)}
                   className="seg flex items-center gap-1.5 px-3.5 py-2 text-sm"
                 >
-                  <Eye size={15} /> 显示
+                  <Eye size={15} /> Show
                 </button>
                 <button
                   data-on={!showPersonalities}
                   onClick={() => setShowPersonalities(false)}
                   className="seg flex items-center gap-1.5 px-3.5 py-2 text-sm"
                 >
-                  <EyeSlash size={15} /> 隐藏
+                  <EyeSlash size={15} /> Hide
                 </button>
               </div>
             </div>
             <div>
-              <div className="text-sm font-medium mb-2.5">起始筹码</div>
+              <div className="text-sm font-medium mb-2.5">Starting stack</div>
               <div className="flex gap-1.5">
                 {STACK_OPTIONS.map((s) => (
                   <button
@@ -260,38 +264,38 @@ export default function SetupPage() {
           </div>
 
           <div>
-            <div className="text-sm font-medium mb-2.5">对手破产后</div>
+            <div className="text-sm font-medium mb-2.5">When opponents go broke</div>
             <div className="flex gap-1.5">
               <button
                 data-on={botRebuy}
                 onClick={() => setBotRebuy(true)}
                 className="seg flex items-center gap-1.5 px-3.5 py-2 text-sm"
               >
-                <ArrowsClockwise size={15} /> 自动补码
+                <ArrowsClockwise size={15} /> Auto rebuy
               </button>
               <button
                 data-on={!botRebuy}
                 onClick={() => setBotRebuy(false)}
                 className="seg flex items-center gap-1.5 px-3.5 py-2 text-sm"
               >
-                <SignOut size={15} /> 直接下桌
+                <SignOut size={15} /> Leave table
               </button>
             </div>
           </div>
           <p className="text-xs text-muted leading-relaxed -mt-2">
             {showPersonalities
-              ? '座位上会标出对手风格, 适合练针对性调整。'
-              : '盲打模式: 自己读对手牌风, 复盘时揭晓。'}
-            随时点「结束并复盘」收官。
+              ? 'Opponent personalities are shown at seats, good for practicing exploitative adjustments.'
+              : 'Blind mode: read opponents‘ tendencies yourself, revealed during review.'}
+            Click “End & Review” anytime to finish.
           </p>
 
           <div className="pt-3 border-t border-white/10">
             <p className="text-xs text-muted mb-4">
-              盲注 1/2 · 现金桌规则, 对手破产{botRebuy ? '自动补码' : '直接下桌'}
+              Blinds 1/2 · Cash game rules, opponents {botRebuy ? 'auto rebuy' : 'leave table'} when broke
             </p>
             <button onClick={start} className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 text-[15px]">
               <Play size={18} weight="fill" />
-              开始训练
+              Start training
             </button>
           </div>
         </motion.section>
